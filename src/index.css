@@ -8,89 +8,145 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Base colors - clean, modern palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 222 47% 11%;
+    
+    /* Surface colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 222 47% 11%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 222 47% 11%;
+    
+    /* Premium blue-purple gradient scheme */
+    --primary: 250 95% 63%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 250 100% 70%;
+    --primary-dark: 250 90% 55%;
+    
+    /* Secondary purple accent */
+    --secondary: 270 60% 96%;
+    --secondary-foreground: 250 95% 63%;
+    
+    /* Muted backgrounds with warmth */
+    --muted: 240 20% 97%;
+    --muted-foreground: 222 20% 45%;
+    
+    /* Accent with gradient potential */
+    --accent: 260 60% 96%;
+    --accent-foreground: 250 95% 63%;
+    
+    /* Status colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Borders and inputs - subtle */
+    --border: 240 20% 92%;
+    --input: 240 20% 96%;
+    --ring: 250 95% 63%;
+    
+    --radius: 1.25rem;
+    
+    /* Glass morphism effects */
+    --glass-background: 0 0% 100% / 0.7;
+    --glass-border: 240 20% 92% / 0.5;
+    
+    /* Sidebar */
+    --sidebar-background: 250 30% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 250 95% 63%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 60% 96%;
+    --sidebar-accent-foreground: 250 95% 63%;
+    --sidebar-border: 240 20% 92%;
+    --sidebar-ring: 250 95% 63%;
+    
+    /* Message bubbles */
+    --bubble-user: 250 95% 63%;
+    --bubble-user-foreground: 0 0% 100%;
+    --bubble-ai: 240 20% 97%;
+    --bubble-ai-foreground: 222 47% 11%;
+    
+    /* Input bar */
+    --input-bar-background: 0 0% 100%;
+    --input-bar-border: 240 20% 90%;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    /* Dark mode - deep, rich background */
+    --background: 222 47% 7%;
+    --foreground: 0 0% 98%;
+    
+    --card: 222 47% 10%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 222 47% 10%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Vibrant primary in dark mode */
+    --primary: 250 95% 63%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 250 100% 70%;
+    --primary-dark: 250 90% 55%;
+    
+    --secondary: 250 40% 15%;
+    --secondary-foreground: 250 95% 75%;
+    
+    --muted: 222 47% 12%;
+    --muted-foreground: 220 20% 65%;
+    
+    --accent: 250 40% 15%;
+    --accent-foreground: 250 95% 75%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    --border: 222 47% 15%;
+    --input: 222 47% 12%;
+    --ring: 250 95% 63%;
+    
+    /* Glass effects in dark mode */
+    --glass-background: 222 47% 10% / 0.7;
+    --glass-border: 222 47% 20% / 0.5;
+    
+    --sidebar-background: 222 47% 9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 250 95% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 250 40% 15%;
+    --sidebar-accent-foreground: 250 95% 75%;
+    --sidebar-border: 222 47% 15%;
+    --sidebar-ring: 250 95% 63%;
+    
+    --bubble-user: 250 95% 63%;
+    --bubble-user-foreground: 0 0% 100%;
+    --bubble-ai: 222 47% 12%;
+    --bubble-ai-foreground: 0 0% 98%;
+    
+    --input-bar-background: 222 47% 10%;
+    --input-bar-border: 222 47% 20%;
   }
 }
 
@@ -100,6 +156,88 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  /* Glass morphism utility */
+  .glass {
+    background: hsl(var(--glass-background));
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+  
+  /* Gradient utilities */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
+  }
+  
+  .gradient-mesh {
+    background: radial-gradient(at 0% 0%, hsl(var(--primary) / 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsl(var(--accent)) 0px, transparent 50%);
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  /* Message bubble animations */
+  @keyframes message-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .message-slide-in {
+    animation: message-slide-in 0.3s ease-out;
+  }
+  
+  /* Voice recording pulse */
+  @keyframes voice-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.1);
+    }
+  }
+  
+  .voice-pulse {
+    animation: voice-pulse 1.5s ease-in-out infinite;
+  }
+  
+  /* Typing indicator */
+  @keyframes typing-dot {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    30% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+  }
+  
+  .typing-dot {
+    animation: typing-dot 1.4s ease-in-out infinite;
+  }
+  
+  /* Hover lift effect */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
   }
 }

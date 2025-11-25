@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { MultiActionInput } from "./MultiActionInput";
+import { useAIProvider, AIProviderType } from "@/hooks/useAIProvider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface Message {
   id: string;
@@ -11,65 +15,163 @@ interface Message {
   timestamp: string;
 }
 
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content: "Hello! I'm your AI assistant. How can I help you today?",
-    timestamp: "10:30 AM",
-  },
-  {
-    id: "2",
-    role: "user",
-    content: "Can you help me design a modern landing page?",
-    timestamp: "10:31 AM",
-  },
-  {
-    id: "3",
-    role: "assistant",
-    content: "Of course! I'd be happy to help you design a modern landing page. Let's start by discussing your goals and target audience. What type of product or service will this landing page be for?",
-    timestamp: "10:31 AM",
-  },
-];
-
 export const ChatArea = () => {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
+  const { provider, changeProvider, sendMessage } = useAIProvider();
 
-  const handleSend = (content: string) => {
-    const newMessage: Message = {
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages, streamingContent, isTyping]);
+
+  // Sleep function for typing effect
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setIsTyping(false);
+    setStreamingContent("");
+  };
+
+  const handleSend = async (content: string) => {
+    if (!content || !content.trim()) {
+      return;
+    }
+
+    // Add user message
+    const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
     
-    setMessages([...messages, newMessage]);
-    
-    // Simulate AI response
+    setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
+    setStreamingContent("");
+
+    try {
+      // Call AI provider
+      const responseText = await sendMessage(content);
+      
+      // Add empty assistant message that will be filled
+      const assistantMessageId = (Date.now() + 1).toString();
+      const assistantMessage: Message = {
+        id: assistantMessageId,
         role: "assistant",
-        content: "I'm processing your request. This is a demo response.",
+        content: "",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      setMessages((prev) => [...prev, aiResponse]);
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      
+      // Simulate typing effect
+      if (responseText) {
+        for (let i = 0; i < responseText.length; i++) {
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === assistantMessageId 
+                ? { ...msg, content: responseText.substring(0, i + 1) }
+                : msg
+            )
+          );
+          await sleep(10); // Adjust speed as needed
+        }
+      }
+    } catch (error: any) {
+      console.error('Error sending message:', error);
+      
+      // Add error message
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        role: "assistant",
+        content: error.message || 'Sorry, there was an error processing your request.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 2000);
+      setStreamingContent("");
+    }
   };
 
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Chat Header */}
       <div className="border-b border-border px-6 py-4 bg-card/50">
-        <h2 className="text-lg font-semibold">AI Workspace</h2>
-        <p className="text-sm text-muted-foreground">Ask anything, create anything</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div>
+              <h2 className="text-lg font-semibold">AI Workspace</h2>
+              <p className="text-sm text-muted-foreground">Ask anything, create anything</p>
+            </div>
+            <Button 
+              onClick={handleNewChat}
+              variant="outline" 
+              size="sm"
+              className="rounded-full"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Chat
+            </Button>
+          </div>
+          
+          {/* AI Provider Selector */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">Provider:</span>
+            <Select value={provider} onValueChange={(value) => changeProvider(value as AIProviderType)}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Select AI" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gemini">
+                  <div className="flex items-center gap-2">
+                   
+                    <span>Gemini</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="openai">
+                  <div className="flex items-center gap-2">
+                    
+                    <span>OpenAI GPT</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="claude">
+                  <div className="flex items-center gap-2">
+                    
+                    <span>Claude</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="nvidia">
+                  <div className="flex items-center gap-2">
+                    
+                    <span>NVIDIA</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="meta">
+                  <div className="flex items-center gap-2">
+                   
+                    <span>Meta Llama</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       {/* Messages Area */}
-      <ScrollArea className="flex-1 px-6">
+      <ScrollArea className="flex-1 px-6" ref={scrollAreaRef}>
         <div className="py-6 space-y-6 max-w-4xl mx-auto">
           {messages.map((message) => (
             <MessageBubble key={message.id} {...message} />

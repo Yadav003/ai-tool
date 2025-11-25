@@ -29,7 +29,7 @@ export const Header = () => {
         </div>
 
         {/* Model Selector */}
-        <div className="flex-1 max-w-xs mx-4">
+        {/* <div className="flex-1 max-w-xs mx-4">
           <Select defaultValue="gpt-4">
             <SelectTrigger className="bg-muted/50 border-border/50 rounded-full h-9">
               <SelectValue />
@@ -41,7 +41,7 @@ export const Header = () => {
               <SelectItem value="gemini">Gemini Pro</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
 
         {/* User Menu */}
         <div className="flex items-center gap-2">

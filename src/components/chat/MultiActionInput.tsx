@@ -68,7 +68,7 @@ export const MultiActionInput = ({
   return (
     <div className="w-full max-w-4xl mx-auto space-y-3">
       {/* Quick Modes */}
-      <div className="flex items-center gap-2 px-4">
+      {/* <div className="flex items-center gap-2 px-4">
         <span className="text-xs text-muted-foreground">Mode:</span>
         {quickModes.map((mode) => (
           <Badge
@@ -80,7 +80,7 @@ export const MultiActionInput = ({
             {mode.label}
           </Badge>
         ))}
-      </div>
+      </div> */}
 
       {/* Input Bar */}
       <div className="relative glass rounded-[2rem] border border-border shadow-xl">

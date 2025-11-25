@@ -8,9 +8,10 @@ interface MessageBubbleProps {
   content: string;
   timestamp: string;
   avatar?: string;
+  type?: "text" | "image";
 }
 
-export const MessageBubble = ({ role, content, timestamp, avatar }: MessageBubbleProps) => {
+export const MessageBubble = ({ role, content, timestamp, avatar, type = "text" }: MessageBubbleProps) => {
   const isUser = role === "user";
 
   return (
@@ -41,7 +42,28 @@ export const MessageBubble = ({ role, content, timestamp, avatar }: MessageBubbl
               : "bg-bubble-ai text-bubble-ai-foreground border border-border/50"
           )}
         >
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+          {type === "image" ? (
+            <div className="relative">
+              <img 
+                src={content} 
+                alt="Generated image" 
+                className="rounded-2xl max-w-full h-auto max-h-96 object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ddd' width='400' height='300'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EImage failed to load%3C/text%3E%3C/svg%3E";
+                }}
+              />
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="mt-2"
+                onClick={() => window.open(content, '_blank')}
+              >
+                Open Full Size
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+          )}
         </div>
 
         {/* Timestamp and Actions */}

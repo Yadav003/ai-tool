@@ -29,19 +29,24 @@ const quickModes = [
 
 interface MultiActionInputProps {
   onSend: (message: string) => void;
-  onVoiceStart?: () => void;
+  onVoiceStart?: (onComplete: (text: string) => void) => void;
+  onVoiceStop?: () => void;
+  onTextToSpeech?: (text: string) => void;
   onImageGenerate?: () => void;
   onFileUpload?: () => void;
+  isRecording?: boolean;
 }
 
 export const MultiActionInput = ({
   onSend,
   onVoiceStart,
+  onVoiceStop,
+  onTextToSpeech,
   onImageGenerate,
   onFileUpload,
+  isRecording: externalIsRecording = false,
 }: MultiActionInputProps) => {
   const [message, setMessage] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
@@ -58,10 +63,28 @@ export const MultiActionInput = ({
     }
   };
 
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    if (!isRecording && onVoiceStart) {
-      onVoiceStart();
+  const toggleRecording = async () => {
+    if (externalIsRecording) {
+      // Stop recording manually
+      if (onVoiceStop) {
+        onVoiceStop();
+      }
+    } else {
+      // Start recording with auto-transcribe callback
+      if (onVoiceStart) {
+        onVoiceStart((transcribedText) => {
+          // Auto-send the transcribed text
+          if (transcribedText && transcribedText.trim()) {
+            onSend(transcribedText);
+          }
+        });
+      }
+    }
+  };
+
+  const handleTextToSpeech = () => {
+    if (message.trim() && onTextToSpeech) {
+      onTextToSpeech(message);
     }
   };
 
@@ -102,7 +125,7 @@ export const MultiActionInput = ({
                 <TooltipContent>Upload file</TooltipContent>
               </Tooltip>
 
-              <Tooltip>
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
@@ -114,7 +137,7 @@ export const MultiActionInput = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Generate image</TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
 
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -123,14 +146,14 @@ export const MultiActionInput = ({
                     size="icon"
                     className={cn(
                       "rounded-full h-9 w-9",
-                      isRecording && "bg-destructive text-destructive-foreground voice-pulse"
+                      externalIsRecording && "bg-destructive text-destructive-foreground voice-pulse"
                     )}
                     onClick={toggleRecording}
                   >
                     <Mic className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Voice input</TooltipContent>
+                <TooltipContent>{externalIsRecording ? 'Stop recording' : 'Voice input'}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -139,6 +162,8 @@ export const MultiActionInput = ({
                     variant="ghost"
                     size="icon"
                     className="rounded-full h-9 w-9"
+                    onClick={handleTextToSpeech}
+                    disabled={!message.trim()}
                   >
                     <Volume2 className="w-5 h-5" />
                   </Button>

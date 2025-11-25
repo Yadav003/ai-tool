@@ -3,16 +3,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { MultiActionInput } from "./MultiActionInput";
-import { useAIProvider, AIProviderType } from "@/hooks/useAIProvider";
+import { useAIProvider, AIProviderType, ImageProviderType } from "@/hooks/useAIProvider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Image as ImageIcon } from "lucide-react";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  type?: "text" | "image";
 }
 
 export const ChatArea = () => {
@@ -21,7 +22,7 @@ export const ChatArea = () => {
   const [streamingContent, setStreamingContent] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
-  const { provider, changeProvider, sendMessage } = useAIProvider();
+  const { provider, imageProvider, changeProvider, changeImageProvider, sendMessage, isRecording, startVoiceRecording, stopVoiceRecording, textToSpeech } = useAIProvider();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -61,30 +62,44 @@ export const ChatArea = () => {
 
     try {
       // Call AI provider
-      const responseText = await sendMessage(content);
+      const response = await sendMessage(content);
       
-      // Add empty assistant message that will be filled
-      const assistantMessageId = (Date.now() + 1).toString();
-      const assistantMessage: Message = {
-        id: assistantMessageId,
-        role: "assistant",
-        content: "",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-      
-      // Simulate typing effect
-      if (responseText) {
-        for (let i = 0; i < responseText.length; i++) {
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === assistantMessageId 
-                ? { ...msg, content: responseText.substring(0, i + 1) }
-                : msg
-            )
-          );
-          await sleep(10); // Adjust speed as needed
+      // Check if it's an image response
+      if (response.type === 'image') {
+        const imageMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: response.content,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: 'image'
+        };
+        setMessages(prev => [...prev, imageMessage]);
+      } else {
+        // Add empty assistant message that will be filled
+        const assistantMessageId = (Date.now() + 1).toString();
+        const assistantMessage: Message = {
+          id: assistantMessageId,
+          role: "assistant",
+          content: "",
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: 'text'
+        };
+        
+        setMessages(prev => [...prev, assistantMessage]);
+        
+        // Simulate typing effect
+        const responseText = response.content;
+        if (responseText) {
+          for (let i = 0; i < responseText.length; i++) {
+            setMessages(prev => 
+              prev.map(msg => 
+                msg.id === assistantMessageId 
+                  ? { ...msg, content: responseText.substring(0, i + 1) }
+                  : msg
+              )
+            );
+            await sleep(10);
+          }
         }
       }
     } catch (error: any) {
@@ -128,7 +143,7 @@ export const ChatArea = () => {
           
           {/* AI Provider Selector */}
           <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Provider:</span>
+            {/* Text Model Selector */}
             <Select value={provider} onValueChange={(value) => changeProvider(value as AIProviderType)}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Select AI" />
@@ -136,36 +151,52 @@ export const ChatArea = () => {
               <SelectContent>
                 <SelectItem value="gemini">
                   <div className="flex items-center gap-2">
-                   
                     <span>Gemini</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="openai">
                   <div className="flex items-center gap-2">
-                    
                     <span>OpenAI GPT</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="claude">
                   <div className="flex items-center gap-2">
-                    
                     <span>Claude</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="nvidia">
                   <div className="flex items-center gap-2">
-                    
                     <span>NVIDIA</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="meta">
                   <div className="flex items-center gap-2">
-                   
                     <span>Meta Llama</span>
                   </div>
                 </SelectItem>
               </SelectContent>
             </Select>
+
+            {/* Image Model Selector */}
+            {/* <Select value={imageProvider} onValueChange={(value) => changeImageProvider(value as ImageProviderType)}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Image Model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dalle">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    <span>DALL-E 3</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="imagen">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    <span>Imagen 3.0</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select> */}
           </div>
         </div>
       </div>
@@ -184,9 +215,12 @@ export const ChatArea = () => {
       <div className="border-t border-border px-6 py-6 bg-card/30">
         <MultiActionInput
           onSend={handleSend}
-          onVoiceStart={() => console.log("Voice recording started")}
+          onVoiceStart={(onComplete) => startVoiceRecording(onComplete)}
+          onVoiceStop={stopVoiceRecording}
+          onTextToSpeech={textToSpeech}
           onImageGenerate={() => console.log("Image generation modal")}
           onFileUpload={() => console.log("File upload")}
+          isRecording={isRecording}
         />
       </div>
     </div>

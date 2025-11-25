@@ -31,7 +31,25 @@ export const AI_CONFIG = {
     baseURL: 'https://api.together.xyz/v1',
     temperature: 0.7,
     maxTokens: 1024
+  },
+  // Image Generation
+  imageGeneration: {
+    provider: 'gemini',
+    gemini: {
+      apiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyBI0bRLT4wUFFBXJIBwTF7eDfcIC57roik',
+      model: 'gemini-2.5-flash-image', 
+    },
+  },
+  // Audio/Voice (TTS & STT)
+  audio: {
+    provider: 'gemini',
+    gemini: {
+      apiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyBI0bRLT4wUFFBXJIBwTF7eDfcIC57roik',
+      model: 'gemini-2.5-flash', // Multimodal model with audio support
+    },
   }
 };
 
 export type AIProviderConfig = typeof AI_CONFIG;
+// gemini-2.5-flash-preview-tts  this model converts the text to audio 
+// gemini-2.0-flash-exp

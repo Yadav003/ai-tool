@@ -19,6 +19,29 @@ interface Message {
   content: string;
 }
 
+type GeminiInlineDataPart = {
+  inlineData: {
+    mimeType: string;
+    data: string;
+  };
+};
+
+type GeminiTextPart = {
+  text: string;
+};
+
+type GeminiPart = GeminiInlineDataPart | GeminiTextPart;
+
+type ApiErrorLike = {
+  status?: number;
+  message?: string;
+  error?: {
+    error?: {
+      code?: string;
+    };
+  };
+};
+
 export const useAIProvider = () => {
   const [provider, setProvider] = useState<AIProviderType>('gemini');
   const [imageProvider, setImageProvider] = useState<ImageProviderType>('gemini');
@@ -27,6 +50,16 @@ export const useAIProvider = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [silenceTimeout, setSilenceTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return 'Unknown error';
+    }
+  };
 
   // Initialize AI clients
   const initializeClient = useCallback((providerType: AIProviderType) => {
@@ -73,7 +106,7 @@ export const useAIProvider = () => {
     
     // If files are present, create multimodal request
     if (files && files.length > 0) {
-      const parts: any[] = [];
+      const parts: GeminiPart[] = [];
       
       // Add file parts first
       for (const file of files) {
@@ -212,9 +245,9 @@ export const useAIProvider = () => {
 
       console.log(' Image edited successfully');
       return base64;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(' Image editing error:', error);
-      throw new Error(`Failed to edit image: ${error.message}`);
+      throw new Error(`Failed to edit image: ${getErrorMessage(error)}`);
     }
   };
 
@@ -332,22 +365,26 @@ export const useAIProvider = () => {
       }
 
       return { type: 'text', content: responseText };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error calling ${provider} API:`, error);
+
+      const err = error as ApiErrorLike;
       
       // Handle different error types
       let errorMessage = 'Sorry, there was an error processing your request.';
       
-      if (error?.status === 429 || error?.error?.error?.code === 'rate_limit_exceeded') {
+      if (err?.status === 429 || err?.error?.error?.code === 'rate_limit_exceeded') {
         errorMessage = ' Rate limit exceeded. You have exceeded your API quota or requests per minute.';
-      } else if (error?.status === 401 || error?.error?.error?.code === 'invalid_api_key') {
+      } else if (err?.status === 401 || err?.error?.error?.code === 'invalid_api_key') {
         errorMessage = ' Invalid API key. Please check your API key configuration.';
-      } else if (error?.status === 403) {
+      } else if (err?.status === 403) {
         errorMessage = ' Access forbidden. Please verify your API key has the necessary permissions.';
-      } else if (error?.status === 500 || error?.status === 503) {
+      } else if (err?.status === 500 || err?.status === 503) {
         errorMessage = ` ${provider} service is temporarily unavailable. Please try again in a moment.`;
-      } else if (error?.message) {
-        errorMessage = `Error: ${error.message}`;
+      } else if (err?.message) {
+        errorMessage = `Error: ${err.message}`;
+      } else {
+        errorMessage = `Error: ${getErrorMessage(error)}`;
       }
       
       throw new Error(errorMessage);
@@ -602,9 +639,9 @@ export const useAIProvider = () => {
           console.log(' Playing speech with browser TTS');
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(' TTS error:', error);
-      console.error('Error details:', error?.message || JSON.stringify(error, null, 2));
+      console.error('Error details:', getErrorMessage(error));
       
       // Fallback to browser TTS on error
       if ('speechSynthesis' in window) {

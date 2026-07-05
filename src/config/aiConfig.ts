@@ -2,14 +2,14 @@ export const AI_CONFIG = {
   gemini: {
     apiKey:
       import.meta.env.VITE_GEMINI_API_KEY ||
-      "AIzaSyBeNt1gRnzdxXh2dJiY9Nl2KG12BQoS6wU",
+      "your key ",
     // model: 'gemini-2.0-flash' || 'gemini-2.5-flash' ||'gemini-2.5-flash-preview-09-2025'||'gemini-flash-latest'||'gemini-2.5-pro' ||'gemini-2.5-flash-lite'||'gemini-2.5-flash-lite-preview-09-2025' ||'gemini-2.0-flash-lite' (these all are available models to use for free )
     model: "gemini-2.5-flash-lite-preview-09-2025",
   },
   openai: {
     apiKey:
       import.meta.env.VITE_OPENAI_API_KEY ||
-      "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",
+      "your key ",
     model: "gpt-4",
     baseURL: "https://api.openai.com/v1",
   },
@@ -22,8 +22,7 @@ export const AI_CONFIG = {
   },
   nvidia: {
     apiKey:
-      import.meta.env.VITE_NVIDIA_API_KEY ||
-      "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",
+      import.meta.env.VITE_NVIDIA_API_KEY ,
     model: "nvidia/llama-3.1-nemotron-70b-instruct",
     baseURL: "https://integrate.api.nvidia.com/v1",
     temperature: 0.5,
@@ -42,7 +41,7 @@ export const AI_CONFIG = {
     gemini: {
       apiKey:
         import.meta.env.VITE_GEMINI_API_KEY ||
-        "AIzaSyBI0bRLT4wUFFBXJIBwTF7eDfcIC57roik",
+        "your key",
       model: "gemini-2.5-flash-image",
       // model: 'gemini-2.0-flash-preview-image-generation',
     },
@@ -53,7 +52,7 @@ export const AI_CONFIG = {
     gemini: {
       apiKey:
         import.meta.env.VITE_GEMINI_API_KEY ||
-        "AIzaSyBI0bRLT4wUFFBXJIBwTF7eDfcIC57roik",
+        "your key",
       // model: 'gemini-2.5-flash'||'gemini-2.5-pro' ||'gemini-2.5-flash-lite' ||'gemini-2.5-flash-lite-preview-09-2025' || 'gemini-2.0-flash' ||'gemini-2.0-flash-lite' ||'gemini-2.5-flash-preview-09-2025' (these all are available models to use for free )
       model: "gemini-flash-latest",
       ttsModel: "gemini-2.5-flash-preview-tts", // For text-to-speech
